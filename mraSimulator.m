@@ -56,4 +56,24 @@ classdef mraSimulator < handle
 			this.theta3 = val(3);
 		end
 	end
+	
+	methods (Static)
+		% method for simple coordinate conversion
+		function xyz3 = getEndPointXYZ(thetas)
+			t1 = thetas(1);
+			t2 = thetas(2);
+			t3 = thetas(3);
+			dtheta = t2;
+			x2 = mraSimulator.h2*cos(dtheta)*cos(t1);
+			y2 = mraSimulator.h2*cos(dtheta)*sin(t1);
+			z2 = mraSimulator.h2*sin(dtheta);
+			xyz2 = [x2 y2 z2] + mraSimulator.xyz1;
+			
+			dtheta = t3 - (pi/2 - t2);
+			x3 = mraSimulator.h2*cos(dtheta)*cos(t1);
+			y3 = mraSimulator.h2*cos(dtheta)*sin(t1);
+			z3 = mraSimulator.h2*sin(dtheta);
+			xyz3 = [x3 y3 z3] + xyz2;
+		end
+	end
 end

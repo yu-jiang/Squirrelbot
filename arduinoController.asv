@@ -15,10 +15,6 @@ classdef arduinoController < handle
 		isconnected = false;
 	end
     
-	properties (Dependent)
-		EndPointData = [];
-	end
-	
     methods
 		
 		function copyAngle(this, simulator)
@@ -63,32 +59,8 @@ classdef arduinoController < handle
 			end
 		end
 		
-		
-		% -- Trajectories
-		function addTrjPoint(this, val)
-			assert(all(size(val) == [1 3]));
-			this.SavedTrj = [this.SavedTrj ; val];
-		end
-		
 		function clearSavedTrj(this)
-			this.SavedTrj = [];
-		end
-		
-		function loadTrj(this, trj)
-			assert(size(trj,2) == 3);
-			this.SavedTrj = trj;
-		end
-		
-		function val = get.EndPointData(this)
-			val = ones(size(this.SavedTrj));
-			for ct = 1:size(val,1)
-				val(ct,:) = mraSimulator.getEndPointXYZ(this.SavedTrj(ct,:));
-			end
-		end
-		
-		% Export trajectory to baseworkspace
-		function exportTrj(this)			
-			assignin('base', 'microRoboticArmTrj', this.SavedTrj);
+			this.
 		end
         
 %         function replay(this, dt)

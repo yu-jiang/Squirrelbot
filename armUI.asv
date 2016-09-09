@@ -15,15 +15,13 @@ classdef armUI < handle
 		
 		buttonConnect
 		buttonReplay
-		buttonAddPoint
-		buttonClear
 		
 		% 
 	end
     
     methods
         function this = armUI()			
-            this.fig = figure('Name', 'Micro Robotic Arm Visualizer', ...
+            this.fig = figure('String', 'Micro Robotic Arm Controller', ...
 				'Position',[400 200 800 400]);
             this.ac = arduinoController;
 			this.positionData = mraSimulator(this.ac.angle1, this.ac.angle2, this.ac.angle3);
@@ -43,21 +41,13 @@ classdef armUI < handle
 				'Position', [420 200 360 30], ...
 				'callback', {@slider3callback, this});
 			this.buttonConnect = uicontrol(this.fig, 'style', 'pushButton', ...
-				'Position', [420 20 90 50], ...,
+				'Position', [420 20 100 50], ...,
 				'String', 'Connect', ...
 				'callback', {@connectButtonCallback, this});
 			this.buttonConnect = uicontrol(this.fig, 'style', 'pushButton', ...
-				'Position', [510 20 90 50], ...,
+				'Position', [520 20 100 50], ...,
 				'String', 'Replay', ...
 				'callback', {@replayButtonCallback, this});
-			this.buttonAddPoint = uicontrol(this.fig, 'style', 'pushButton', ...
-				'Position', [600 20 90 50], ...,
-				'String', 'Log Position', ...
-				'callback', {@addPointButtonCallback, this});
-			this.buttonClear = uicontrol(this.fig, 'style', 'pushButton', ...
-				'Position', [690 20 90 50], ...,
-				'String', 'Clear', ...
-				'callback', {@clearButtonCallback, this});
 			
             [this.lines.l, this.lines.lbase, this.lines.ltrj] = initializeAxes(this);	
         end
@@ -73,12 +63,13 @@ classdef armUI < handle
 			set(this.lines.l, 'YData',[this.positionData.xyz0(2) this.positionData.xyz1(2) this.positionData.xyz2(2) this.positionData.xyz3(2)]);
 			set(this.lines.l, 'ZData',[this.positionData.xyz0(3) this.positionData.xyz1(3) this.positionData.xyz2(3) this.positionData.xyz3(3)]);		
 			
-			% Draw trajectory
-			if ~isempty(this.ac.SavedTrj)
-				set(this.lines.ltrj, 'XData', this.ac.EndPointData(:,1), ...
-					'YData', this.ac.EndPointData(:,2), ...
-					'ZData', this.ac.EndPointData(:,3));
-			end
+			% Draw the trajectory
+			
+			
+			
+			set(this.lines.ltrj, 'XData', this.ac.SavedTrj(:,:,1), ...
+				this.lines.ltrj, 'YData', this.ac.SavedTrj(:,:,2), ...
+				this.lines.ltrj, 'ZData', this.ac.SavedTrj(:,:,3));
 			
 			drawnow;
 		end
@@ -136,20 +127,9 @@ if this.ac.isconnected
 end
 end
 
-function clearButtonCallback(handle, ~, this)
-this.ac.clearSavedTrj;
-set(this.lines.ltrj, 'XData', NaN, ...
-	'YData', NaN, ...
-	'ZData', NaN);
-update(this);
-end
-
 function replayButtonCallback(handle, ~, this)
 
 for ct = 1:size(this.ac.SavedTrj, 1);
-	if any(isnan(this.ac.SavedTrj(ct,:)))
-		continue
-	end
 	this.positionData.copyAngle(this.ac.SavedTrj(ct,:))
 	this.ac.copyAngle(this.positionData);
 	update(this);
@@ -159,19 +139,11 @@ for ct = 1:size(this.ac.SavedTrj, 1);
 end
 end
 
-function addPointButtonCallback(handle, ~, this)
-this.ac.addTrjPoint([this.ac.angle1 this.ac.angle2 this.ac.angle3]);
-update(this);
-end
-
-
-
 function [l, lbase, ltrj] = initializeAxes(this)
 this.fig;
 this.axis  = gca;
 this.axis.Position = [0.1 0.1 0.4 0.8];
-axis equal
-axis(this.axis, [-5 5 -5 5 0 6]/2);
+axis(this.axis, [-5 5 -5 5 0 10]/2);
 grid on;
 
 % Draw auxillary dashed line
@@ -189,12 +161,5 @@ l = line([this.positionData.xyz0(1) this.positionData.xyz1(1) this.positionData.
 	     'LineWidth', 2);
 	 
 % Initialize the trajectory
-if ~isempty(this.ac.SavedTrj)
-	this.lines.ltrj = line(this.ac.EndPointData(:,1), ...
-		this.ac.EndPointData(:,2), ...
-		this.ac.EndPointData(:,3), ...
-		'Marker', 'o', 'Color', [0 1 0]);
-else
-	ltrj = line(NaN, NaN, 'Marker', 'o', 'Color', [0 1 0]);
-end
+ltrj = line(NaN, NaN, 'Marker', 'o', 'Color', [0 1 0]);
 end
