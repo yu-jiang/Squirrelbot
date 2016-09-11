@@ -13,8 +13,9 @@ classdef mraSimulator < handle
 	
 	properties
 		theta1 = 0
-		theta2 = pi;
-		theta3 = 0
+		theta2 = 0.6*pi;
+		theta3 = 0.5*pi;
+        theta4 = 0.5*pi;
 	end
 	
 	properties (Dependent)
@@ -54,6 +55,7 @@ classdef mraSimulator < handle
 			this.theta1 = val(1);
 			this.theta2 = val(2);
 			this.theta3 = val(3);
+            this.theta4 = val(4);
 		end
 	end
 	

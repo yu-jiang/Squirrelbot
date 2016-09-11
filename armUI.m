@@ -9,6 +9,7 @@ classdef armUI < handle
         sliderMotor1
         sliderMotor2
 		sliderMotor3
+        sliderMotor4
 		
 		simulationOnly = false;
 		positionData 
@@ -42,6 +43,11 @@ classdef armUI < handle
 				'Value', this.positionData.theta3, ...
 				'Position', [420 200 360 30], ...
 				'callback', {@slider3callback, this});
+            this.sliderMotor4 = uicontrol(this.fig, 'style', 'slider', ...
+                'Max', pi, 'Min', 0, ...
+                'Value', 0.5*pi, ...
+                'Position', [420 150 360 30], ...
+                'callback', {@slider4callback, this});
 			this.buttonConnect = uicontrol(this.fig, 'style', 'pushButton', ...
 				'Position', [420 20 90 50], ...,
 				'String', 'Connect', ...
@@ -93,7 +99,8 @@ classdef armUI < handle
 		function updateSliders(this, val)
 			this.sliderMotor1.Value = val(1);
 			this.sliderMotor2.Value = val(2);
-			this.sliderMotor3.Value = val(3);			
+			this.sliderMotor3.Value = val(3);		
+            this.sliderMotor3.Value = val(4);	
 		end
 	end
 % 	
@@ -123,6 +130,12 @@ this.ac.angle3 = handle.Value;
 update(this);
 end
 
+function slider4callback(handle,~,this)
+this.ac.angle4 = handle.Value;
+%this.ac.angle5 = pi - handle.Value;
+update(this);
+end
+
 function connectButtonCallback(handle, ~, this)
 if this.ac.isconnected
 	disConnectArduino(this.ac);
@@ -132,7 +145,7 @@ else
 end
 
 if this.ac.isconnected
-	this.String = 'Disconnect';
+	handle.String = 'Disconnect';
 end
 end
 
@@ -145,7 +158,7 @@ update(this);
 end
 
 function replayButtonCallback(handle, ~, this)
-
+this.ac.autolog = false;
 for ct = 1:size(this.ac.SavedTrj, 1);
 	if any(isnan(this.ac.SavedTrj(ct,:)))
 		continue
@@ -155,12 +168,13 @@ for ct = 1:size(this.ac.SavedTrj, 1);
 	update(this);
 	updateSliders(this, this.ac.SavedTrj(ct,:));
 	disp(this.ac.SavedTrj(ct,:));
-	pause(0.1);
+	pause(0.01);
 end
+this.ac.autolog = true;
 end
 
 function addPointButtonCallback(handle, ~, this)
-this.ac.addTrjPoint([this.ac.angle1 this.ac.angle2 this.ac.angle3]);
+this.ac.addTrjPoint([this.ac.angle1 this.ac.angle2 this.ac.angle3 this.ac.angle4]);
 update(this);
 end
 
